@@ -48,19 +48,44 @@ model Account {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
   @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("account")
 }
 
 ///////////////////
 // Session
 ///////////////////
+
 model Session {
   id           String   @id @default(uuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
 }
 
 //////////////////////
@@ -94,6 +119,11 @@ model User {
   certificates   Certificate[]
   accounts       Account[]
   sessions       Session[]
+  emailVerified  Boolean          @default(false)
+  image          String?
+  updatedAt      DateTime         @updatedAt
+
+  @@map("user")
 }
 
 //////////////////////
@@ -198,4 +228,16 @@ model Certificate {
   job     Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, jobId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }
