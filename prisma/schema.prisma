@@ -35,71 +35,6 @@ enum ApplicationStatus {
   COMPLETED
 }
 
-//////////////////
-// Account
-//////////////////
-
-model Account {
-  id                String @id @default(uuid())
-  userId            String
-  provider          String
-  providerAccountId String
-  type              String
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  accountId             String
-  providerId            String
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-
-  @@unique([provider, providerAccountId])
-  @@index([userId])
-  @@map("account")
-}
-
-///////////////////
-// Session
-///////////////////
-
-model Session {
-  id           String   @id @default(uuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
-  token     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ipAddress String?
-  userAgent String?
-
-  @@unique([token])
-  @@index([userId])
-  @@map("session")
-}
-
-//////////////////////
-// VerificationToken
-//////////////////////
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
 ///////////////////
 // USER
 ///////////////////
@@ -108,22 +43,16 @@ model User {
   id        String   @id @default(uuid())
   name      String
   email     String   @unique
-  password  String?
+  password  String
   role      UserRole
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   studentProfile StudentProfile?
   company        Company?
   applications   JobApplication[]
   submissions    Submission[]
   certificates   Certificate[]
-  accounts       Account[]
-  sessions       Session[]
-  emailVerified  Boolean          @default(false)
-  image          String?
-  updatedAt      DateTime         @updatedAt
-
-  @@map("user")
 }
 
 //////////////////////
@@ -228,16 +157,4 @@ model Certificate {
   job     Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, jobId])
-}
-
-model Verification {
-  id         String   @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([identifier])
-  @@map("verification")
 }
