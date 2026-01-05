@@ -1,7 +1,7 @@
 import { NextRequest,NextResponse } from "next/server";
 import {prisma} from "@/lib/prisma";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { SignJWT } from "jose";
 import { SigninSchema } from "@/lib/schema/SigninSchema.zod";
 
 
@@ -35,24 +35,23 @@ export const POST = async (request: NextRequest) => {
                 { status: 401 }
             );
         }
-        const token = jwt.sign(
-            { userId: user.id, role: user.role },
-            process.env.JWT_SECRET!,
-            { expiresIn: "1h" }
-        );
+        const token = await new SignJWT({ userId: user.id, role: user.role })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("7d")
+      .sign(new TextEncoder().encode(process.env.JWT_SECRET!));
 
-        const response = NextResponse.json(
-            {
-                message: "Login successful",
-                user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                },
-            },
-            { status: 200 }
-        );
+        const response = NextResponse.json({
+        message: "Login successful",
+        user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+        },
+        });
+
+
+    
         response.cookies.set("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
