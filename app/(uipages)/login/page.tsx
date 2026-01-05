@@ -11,17 +11,43 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setIsLoading(true);
-    // TODO: Implement actual authentication
-    await new Promise((r) => setTimeout(r, 1000));
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+      console.log("Login successful:", data);
+      const role = data.user.role;
+
+      if (role === "STUDENT") {
+        router.push("/student/dashboard");
+      } else if (role === "COMPANY") {
+        router.push("/company/dashboard");
+      } else {
+        router.push("/");
+      }
+    } catch (error) {
+      console.log("error in frontend login ", error);
+    }
     setIsLoading(false);
   }
 
