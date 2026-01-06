@@ -24,6 +24,7 @@ export default async function CompanyDashboard() {
       const { payload } = await jwtVerify(token, secret);
       userName = payload.name as string;
       userRole = payload.role as string;
+      console.log(userName);
     } catch (error) {
       console.error("Invalid JWT", error);
     }

@@ -21,6 +21,7 @@ export function Navbar({ userRole, userName }: NavbarProps) {
 
       router.push("/login");
       router.refresh();
+      window.location.reload();
     } catch (error) {
       console.error("Logout failed", error);
     }

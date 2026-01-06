@@ -9,8 +9,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { getAllUsers } from "../actions";
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
   const stats = [
     {
       label: "Total Users",
@@ -33,32 +34,34 @@ export default function AdminDashboard() {
     },
   ];
 
-  const recentUsers = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      role: "STUDENT",
-      joinedAt: "2 hours ago",
-      status: "ACTIVE",
-    },
-    {
-      id: 2,
-      name: "TechCorp Inc.",
-      email: "recruit@techcorp.com",
-      role: "COMPANY",
-      joinedAt: "1 day ago",
-      status: "ACTIVE",
-    },
-    {
-      id: 3,
-      name: "Sarah Smith",
-      email: "sarah@example.com",
-      role: "STUDENT",
-      joinedAt: "3 days ago",
-      status: "ACTIVE",
-    },
-  ];
+  // const allUsers = [
+  //   {
+  //     id: 1,
+  //     name: "John Doe",
+  //     email: "john@example.com",
+  //     role: "STUDENT",
+  //     joinedAt: "2 hours ago",
+  //     status: "ACTIVE",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "TechCorp Inc.",
+  //     email: "recruit@techcorp.com",
+  //     role: "COMPANY",
+  //     joinedAt: "1 day ago",
+  //     status: "ACTIVE",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Sarah Smith",
+  //     email: "sarah@example.com",
+  //     role: "STUDENT",
+  //     joinedAt: "3 days ago",
+  //     status: "ACTIVE",
+  //   },
+  // ];
+
+  const allUsers = await getAllUsers();
 
   const pendingVerifications = [
     {
@@ -141,7 +144,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentUsers.map((user) => (
+                  {allUsers.map((user) => (
                     <div
                       key={user.id}
                       className="p-4 rounded-lg border border-border/40 hover:border-border/80"
@@ -165,13 +168,13 @@ export default function AdminDashboard() {
                             >
                               {user.role}
                             </Badge>
-                            <Badge className="bg-green-100 text-green-800">
+                            {/* <Badge className="bg-green-100 text-green-800">
                               {user.status}
-                            </Badge>
+                            </Badge> */}
                           </div>
                         </div>
                         <div className="text-right text-sm text-muted-foreground">
-                          {user.joinedAt}
+                          {new Date(user.createdAt).toLocaleDateString()}
                         </div>
                       </div>
                     </div>
