@@ -9,8 +9,26 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
 
-export default function StudentDashboard() {
+const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+
+export default async function StudentDashboard() {
+  const token = (await cookies()).get("token")?.value;
+
+  let userName = "Student";
+  let userRole = "STUDENT";
+
+  if (token) {
+    try {
+      const { payload } = await jwtVerify(token, secret);
+      userName = payload.name as string;
+      userRole = payload.role as string;
+    } catch (error) {
+      console.error("Invalid JWT", error);
+    }
+  }
   const stats = [
     { label: "Total Applications", value: "8", icon: "📝" },
     { label: "In Review", value: "2", icon: "⏳" },
@@ -76,13 +94,13 @@ export default function StudentDashboard() {
 
   return (
     <main className="min-h-screen bg-background">
-      <Navbar userRole="STUDENT" userName="John Doe" />
+      <Navbar userRole="STUDENT" userName={userName} />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-            Welcome Back, John
+            Welcome Back, {userName}
           </h1>
           <p className="text-muted-foreground">
             Here&apos;s an overview of your job hunting journey

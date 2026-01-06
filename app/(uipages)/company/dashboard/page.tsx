@@ -9,8 +9,26 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
 
-export default function CompanyDashboard() {
+const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+export default async function CompanyDashboard() {
+  const token = (await cookies()).get("token")?.value;
+
+  let userName = "Company";
+  let userRole = "COMPANY";
+
+  if (token) {
+    try {
+      const { payload } = await jwtVerify(token, secret);
+      userName = payload.name as string;
+      userRole = payload.role as string;
+    } catch (error) {
+      console.error("Invalid JWT", error);
+    }
+  }
+
   const stats = [
     { label: "Active Jobs", value: "5", icon: "📢", color: "text-blue-600" },
     {
@@ -79,7 +97,7 @@ export default function CompanyDashboard() {
 
   return (
     <main className="min-h-screen bg-background">
-      <Navbar userRole="COMPANY" userName="TechCorp" />
+      <Navbar userRole="COMPANY" userName={userName} />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}

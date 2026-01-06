@@ -18,9 +18,10 @@ import {
 } from "@/components/ui/select";
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignupPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const initialRole =
     searchParams.get("role") === "company" ? "COMPANY" : "STUDENT";
@@ -38,9 +39,27 @@ export default function SignupPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setIsLoading(true);
-    // TODO: Implement actual registration
-    await new Promise((r) => setTimeout(r, 1000));
-    setIsLoading(false);
+    try {
+      console.log(e);
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...formData, role }),
+      });
+      const data = await response.json();
+      console.log("Signup response:", data);
+      if (!response.ok) {
+        throw new Error(data.message || "Signup failed");
+      }
+      // Redirect to login page after successful signup
+      router.push("/login");
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+    // await new Promise((r) => setTimeout(r, 1000));
   }
 
   return (

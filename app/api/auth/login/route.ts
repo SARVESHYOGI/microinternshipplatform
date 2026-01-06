@@ -35,7 +35,7 @@ export const POST = async (request: NextRequest) => {
                 { status: 401 }
             );
         }
-        const token = await new SignJWT({ userId: user.id, role: user.role })
+        const token = await new SignJWT({ userId: user.id, role: user.role, email: user.email , name: user.name})
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("7d")
       .sign(new TextEncoder().encode(process.env.JWT_SECRET!));

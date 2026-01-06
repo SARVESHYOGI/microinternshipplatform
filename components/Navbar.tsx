@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface NavbarProps {
   userRole?: "STUDENT" | "COMPANY" | "ADMIN";
@@ -11,6 +11,20 @@ interface NavbarProps {
 
 export function Navbar({ userRole, userName }: NavbarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      router.push("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
 
   const navLinks = {
     STUDENT: [
@@ -70,8 +84,9 @@ export function Navbar({ userRole, userName }: NavbarProps) {
               size="sm"
               asChild
               className="border-border/40 bg-transparent"
+              onClick={handleLogout}
             >
-              <Link href="/logout">Logout</Link>
+              <Link href="/login">Logout</Link>
             </Button>
           )}
         </div>
